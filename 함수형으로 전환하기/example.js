@@ -101,3 +101,70 @@ _map(
     return user.ages;
   }
 );
+
+// 3. 커링
+// a. _curry, _curryr
+function _curry(fn) {
+  return function (a, b) {
+    return arguments.length === 2
+      ? fn(a, b)
+      : function (b) {
+          return fn(a, b);
+        };
+  };
+}
+
+// 오른쪽 인자부터 적용
+function _curryr(fn) {
+  return function (a, b) {
+    return arguments.length == 2
+      ? fn(a, b)
+      : function (b) {
+          return fn(b, a);
+        };
+  };
+}
+
+const add = _curry(function (a, b) {
+  return a + b;
+});
+
+let add10 = add(10);
+add10(5);
+add(5)(3);
+
+const sub = _curryr(function (a, b) {
+  return a - b;
+});
+
+sub(10, 5); // 10 -5
+
+let sub10 = sub(10);
+sub10(5); // 5-10
+
+// b. _get
+// 오브젝트 안전하게 사용하기
+function _get(obj, key) {
+  return obj === null ? undefined : obj[key];
+}
+
+const _get1 = _curryr(function (obj, key) {
+  return obj === null ? undefined : obj[key];
+});
+
+let user1 = users[0];
+user1.name;
+_get0(users, "name");
+_get1("name")(user1);
+
+const get_name = _get1("name"); //이름을 꺼내오는 함수가 됨
+get_name(user1);
+
+// 30세 이상인 users를 거른다.
+// 30세 이상인 users의 names를 수집한다.
+_map(
+  _filter(users, function (user) {
+    return user.age >= 30;
+  }),
+  _get1("name")
+);
